@@ -1,0 +1,766 @@
+       # 下3个订单,价格逐渐上涨
+        # net = 3
+        # dif = 0.1 * (Tmax - Tmin)
+        # i = 1
+        # client = MongoClient("localhost", 27017)
+        # db = client['BTC']['OKEXLONG']
+        # # db.drop()  # 初始化数据库
+        # while i <= net:
+        #     BTC_Ticker = swapAPI.get_specific_ticker('BTC-USD-SWAP')
+        #     take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+        #         {"type": "1", "price": Tmin + i * dif, "size": "1"}
+        #     ])
+        #     order_id = take_order['order_info'][0]['order_id']  # 获取订单id
+        #     get_order_state = swapAPI.get_order_info('BTC-USDT-SWAP', order_id)
+        #
+        #     datalist = [{
+        #         "订单号": get_order_state['order_id'],
+        #         "价格": get_order_state['price'],
+        #         "状态": get_order_state['state'],
+        #         "方向": get_order_state['type']
+        #     }]
+        #     db.insert_many(datalist)
+        #     i += 1
+        #
+        # read_db = db.find({})
+        # while True:
+        #     for i in db.find({}):
+        #         print('订单查询中')
+        #         print(i['订单号'])
+        #         get_order_state = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+        #         print('order state:', get_order_state['state'])
+        #
+        #         # 如果订单已成交且为开多
+        #         if get_order_state['state'] == "2" and get_order_state['type'] == "1":
+        #             print('开多订单已成交')
+        #             # 删除数据库中数据
+        #             myquery = {"订单号": i['订单号']}
+        #             db.delete_one(myquery)
+        #             # 下一个平多单
+        #             take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+        #                 {"type": "3",
+        #                  "price": float(get_order_state['price']) + 0.8 * (Tmax - float(get_order_state['price'])),
+        #                  "size": "1"}
+        #             ])
+        #             print(take_order['order_info'][0]['order_id'])
+        #             # 查询刚下单的订单信息
+        #             take_new_order = swapAPI.get_order_info('BTC-USDT-SWAP', take_order['order_info'][0]['order_id'])
+        #             # 将新下单的单号插入数据库
+        #             db.insert_one({
+        #                 "订单号": take_new_order['order_id'],
+        #                 "价格": take_new_order['price'],
+        #                 "状态": take_new_order['state'],
+        #                 "方向": take_new_order['type']
+        #             })
+        #
+        #         # 如果订单已成交且为平多
+        #         if get_order_state['state'] == "2" and get_order_state['type'] == "3":
+        #             print('平多订单已成交')
+        #             # 删除数据库中数据
+        #             myquery = {"订单号": i['订单号']}
+        #             db.delete_one(myquery)
+        #
+        #             # 下一个多单
+        #             trend = trend_judge()
+        #             while trend[0] == 1:
+        #                 trend = trend_judge()
+        #             if trend[0] == 2 and float(BTC_Ticker['last']) < (0.9 * trend[2] + 0.1 * trend[1]):  # 处于上涨阶段并在低点状态
+        #                 take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+        #                     {"type": "1", "price": 0.9 * trend[2] + 0.1 * trend[1], "size": "1"}
+        #                 ])
+        #
+        #             if trend[0] == 2 and float(BTC_Ticker['last']) > (0.9 * trend[2] + 0.1 * trend[1]):  # 处于上涨阶段并在低点状态
+        #                 take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+        #                     {"type": "1", "price": 0.9 * trend[2] + 0.1 * trend[1], "size": "1"}
+        #                 ])
+        #                 # 查询刚下单的订单信息
+        #                 take_new_order = swapAPI.get_order_info('BTC-USDT-SWAP',
+        #                                                         take_order['order_info'][0]['order_id'])
+        #                 # 将新下单的单号插入数据库
+        #                 db.insert_one({
+        #                     "订单号": take_new_order['order_id'],
+        #                     "价格": take_new_order['price'],
+        #                     "状态": take_new_order['state'],
+        #                     "方向": take_new_order['type']
+        #                 })
+        #
+        #         if get_order_state['state'] == "-1":
+        #             print('订单已撤销')
+        #             # 删除数据库中数据
+        #             myquery = {"订单号": i['订单号']}
+        #             db.delete_one(myquery)
+        #             new_price = input("请输入新的价格")
+        #             exit()
+        #
+        #             exit()
+
+
+
+    # 选取需要的信息
+    # BTC_Ticker = swapAPI.get_specific_ticker('BTC-USD-SWAP')
+    # orders_list = swapAPI.get_order_list('BTC-USDT-SWAP', '0')
+    #
+    # client = MongoClient("localhost", 27017)
+    # db = client['BTC']['OKEXLONG']
+    # db.drop()  # 初始化数据库
+    # print(orders_list)
+    # print(orders_list['order_info'])
+
+    # 存入数据库
+    # for x in orders_list['order_info']:
+    #     # print(x['order_id'])
+    #
+    #     datalist = [{
+    #         "订单号": x['order_id'],
+    #         "价格": x['price'],
+    #         "状态": x['state'],
+    #         "方向": x['type']
+    #     }]
+    #     db.insert_many(datalist)
+
+    # 读取数据库信息
+    read_db = db.find({})
+    while True:
+        for i in db.find({}):
+            print('订单查询中')
+            print(i['订单号'])
+            get_order_state = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+            print('order state:', get_order_state['state'])
+
+            # 如果订单已成交且为开多
+            if get_order_state['state'] == "2" and get_order_state['type'] == "1":
+                print('开多订单已成交')
+                # 删除数据库中数据
+                myquery = {"订单号": i['订单号']}
+                db.delete_one(myquery)
+                # 下一个平多单
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "3", "price": float(BTC_Ticker['last']) + 50, "size": "1"}
+                ])
+                print(take_order['order_info'][0]['order_id'])
+                # 查询刚下单的订单信息
+                take_new_order = swapAPI.get_order_info('BTC-USDT-SWAP', take_order['order_info'][0]['order_id'])
+                # 将新下单的单号插入数据库
+                db.insert_one({
+                    "订单号": take_new_order['order_id'],
+                    "价格": take_new_order['price'],
+                    "状态": take_new_order['state'],
+                    "方向": take_new_order['type']
+                })
+
+            # 如果订单已成交且为平多
+            if get_order_state['state'] == "2" and get_order_state['type'] == "3":
+                print('平多订单已成交')
+                # 删除数据库中数据
+                myquery = {"订单号": i['订单号']}
+                db.delete_one(myquery)
+
+                # 下一个多单
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "1", "price": float(BTC_Ticker['last']) - 1000, "size": "1"}
+                ])
+                # 查询刚下单的订单信息
+                take_new_order = swapAPI.get_order_info('BTC-USDT-SWAP', take_order['order_info'][0]['order_id'])
+                # 将新下单的单号插入数据库
+                db.insert_one({
+                    "订单号": take_new_order['order_id'],
+                    "价格": take_new_order['price'],
+                    "状态": take_new_order['state'],
+                    "方向": take_new_order['type']
+                })
+
+            if get_order_state['state'] == "-1":
+                print('订单已撤销')
+                # 删除数据库中数据
+                myquery = {"订单号": i['订单号']}
+                db.delete_one(myquery)
+                new_price = input("请输入新的价格")
+
+                # check = True
+                # while check :
+                #     # 传入新的价格
+                #     new_price = input("请输入新的价格")
+                #     if new_price == "" :
+                #         print("撤单成功")
+                #         check = False
+                #     elif new_price == "no" :
+                #         print("手动设置新单")
+                #         new_price = input("请输入新的价格")
+                #         check = False
+                #     elif new_price == "yes":
+                #         print("下市价单")
+                #         check = False
+                #     else :
+                #         print("输入错误，返回重新写"
+                # 下一个多单
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "1", "price": new_price, "size": "1"}
+                ])
+                # 查询刚下单的订单信息
+                take_new_order = swapAPI.get_order_info('BTC-USDT-SWAP', take_order['order_info'][0]['order_id'])
+                # 将新下单的单号插入数据库
+                db.insert_one({
+                    "订单号": take_new_order['order_id'],
+                    "价格": take_new_order['price'],
+                    "状态": take_new_order['state'],
+                    "方向": take_new_order['type']
+                })
+
+            if get_order_state['state'] == "0":
+                print('订单待成交')
+
+    exit()
+
+    # 所有合约持仓信息 （1次/10s）
+    # result = swapAPI.get_position()
+    # 单个合约持仓信息 （20次/2s）
+    # result = swapAPI.get_specific_position('XRP-USD-SWAP')
+    # 所有币种合约账户信息 （当用户没有持仓时，保证金率为10000）（1次/10s）
+    # result = swapAPI.get_accounts()
+    # 单个币种合约账户信息 （当用户没有持仓时，保证金率为10000）（20次/2s）
+    # result = swapAPI.get_coin_account('XRP-USD-SWAP')
+    # 获取某个合约的用户配置 （5次/2s）
+    # result = swapAPI.get_settings('XRP-USD-SWAP')
+    # 设定某个合约的杠杆 （5次/2s）
+    # result = swapAPI.set_leverage('XRP-USD-SWAP', 10, 1)
+    # 账单流水查询 （流水会分页，每页100条数据，并且按照时间倒序排序和存储，最新的排在最前面）（可查询最近7天的数据）（5次/2s）
+    # result = swapAPI.get_ledger('XRP-USD-SWAP')
+    # 下单 （40次/2s）
+    # take_order = swapAPI.take_order('XRP-USD-SWAP', '2', '1', '0.27', match_price='0')
+    # print(take_order)
+    # 批量下单 （每个合约可批量下10个单）（20次/2s）
+    # take_order = swapAPI.take_orders('EOS-USDT-SWAP', [
+    #    {"type": "1", "price": "2.4000", "size": "1"},
+    #    {"type": "2", "price": "2.6000", "size": "1"}
+    # ])
+    # 撤单 （40次/2s）
+    # result = swapAPI.revoke_order('XRP-USD-SWAP', '369874940524453888')
+    # 批量撤单 （每个币对可批量撤10个单）（20次/2s）
+    # result = swapAPI.revoke_orders('EOS-USDT-SWAP', ids=["474928651673972736", "474928651715915776"])
+    # print(result)
+    # 获取所有订单列表 （可查询最近7天20000条数据，支持分页，分页返回结果最大为100条）（20次/2s）
+    # result = swapAPI.get_order_list('XRP-USD-SWAP', '0')
+    # 获取订单信息 （只能查询最近3个月的已成交和已撤销订单信息，已撤销的未成交单只保留2个小时）（40次/2s）
+    # get_order_state = swapAPI.get_order_info('EOS-USDT-SWAP', '369856427972321280')
+    # 获取成交明细 （能查询最近7天的数据）（20次/2s）
+    # result = swapAPI.get_fills('XRP-USD-SWAP')
+    # 获取合约挂单冻结数量 （5次/2s）
+    # result = swapAPI.get_holds_amount('XRP-USD-SWAP')
+    # 委托策略下单 （40次/2s）
+    # result = swapAPI.take_order_algo('XRP-USD-SWAP', '1', '1', '1', trigger_price='0.2640', algo_price='0.2641')
+    # 委托策略撤单 （每次最多可撤6（冰山/时间）/10（计划/跟踪）个）（20 次/2s）
+    # result = swapAPI.cancel_algos('XRP-USD-SWAP', ['367645536490315776'], '1')
+    # 获取委托单列表 （20次/2s）
+    # result = swapAPI.get_order_algos('XRP-USD-SWAP', '1', algo_id='', status='2')
+    # 获取账户手续费费率 （母账户下的子账户的费率和母账户一致。每天凌晨0点更新一次）（1次/10s）
+    # result = swapAPI.get_trade_fee()
+    # 公共-获取合约信息 （20次/2s）
+    # result = swapAPI.get_instruments()
+    # 公共-获取深度数据 （20次/2s）
+    # result = swapAPI.get_depth('BTC-USD-SWAP', '3', '1')
+    # 公共-获取全部ticker信息 （20次/2s）
+    # result = swapAPI.get_ticker()
+    # 公共-获取某个ticker信息 （20次/2s）
+    # result = swapAPI.get_specific_ticker('XRP-USD-SWAP')
+    # print(result)
+    # 公共-获取成交数据 （能查询最近300条数据）（20次/2s）
+    # result = swapAPI.get_trades('XRP-USD-SWAP')
+    # 公共-获取K线数据 （最多可获取最近1440条）（20次/2s）  UTC时间！！！！！！
+    # result = swapAPI.get_kline('XRP-USD-SWAP', '2019-09-29T07:59:45.977Z', '2019-09-29T16:59:45.977Z', 60)
+    # BTC_Line = swapAPI.get_kline('BTC-USDT-SWAP', '2020-04-12T00:59:45.977Z', '2020-04-12T01:59:45.977Z', 180)
+    # 公共-获取指数信息 （20次/2s）
+    # result = swapAPI.get_index('XRP-USD-SWAP')
+    # 公共-获取法币汇率 （20次/2s）
+    # result = swapAPI.get_rate()
+    # 公共-获取平台总持仓量 （20次/2s）
+    # result = swapAPI.get_holds('XRP-USD-SWAP')
+    # 公共-获取当前限价 （20次/2s）
+    # result = swapAPI.get_limit('XRP-USD-SWAP')
+    # 公共-获取强平单 （20次/2s）
+    # result = swapAPI.get_liquidation('XRP-USD-SWAP', '1')
+    # 公共-获取合约资金费率 （20次/2s）
+    # result = swapAPI.get_funding_time('XRP-USD-SWAP')
+    # 公共-获取合约标记价格 （20次/2s）
+    # result = swapAPI.get_mark_price('XRP-USD-SWAP')
+    # 公共-获取合约历史资金费率 （能查询最近7天的数据）（20次/2s）
+    # result = swapAPI.get_historical_funding_rate('XRP-USD-SWAP')
+
+    # 币币API
+    # spot api test
+    # spotAPI = spot.SpotAPI(api_key, seceret_key, passphrase, True)
+    # 获取币币账户信息 （20次/2s）
+    # result = spotAPI.get_account_info()
+    # 获取单一币种账户信息 （20次/2s）
+    # result = spotAPI.get_coin_account_info('okb')
+    # 账单流水查询 最近3个月 （最近3个月的数据）（20次/2s）
+    # result = spotAPI.get_ledger_record('XRP')
+    # 下单 （100次/2s）
+    # take_order = spotAPI.take_order('xrp-usdt', 'buy', client_oid='', type='limit', price='0.1366', size='1')
+    # print(take_order)
+
+    # take orders
+    # params = [
+    #   {"instrument_id": "XRP-USDT", "side": "sell", "type": "market", "size": "1"},
+    #   {"instrument_id": "XRP-USDT", "side": "buy", "type": "market", "notional": "0.3"}
+    # ]
+    # 批量下单 （每次只能下最多4个币对且每个币对可批量下10个单）（50次/2s）
+    # result = spotAPI.take_orders(params)
+    # 撤消指定订单 （100次/2s）
+    # cancel_order = spotAPI.revoke_order('XRP-USDT', order_id='4707713784954880')
+    # revoke orders
+    # 批量撤消订单 （每次只能下最多4个币对且每个币对可批量下10个单）（50次/2s）
+    # params = [
+    #     {'instrument_id': 'xrp-usdt', 'order_ids': ['3956994307262464']
+    #      }
+    # ]
+    # result = spotAPI.revoke_orders(params)
+    # 获取订单列表 （最近3个月的订单信息）（20次/2s）
+    # result = spotAPI.get_orders_list('XRP-USDT', '0')
+    # 获取所有未成交订单 （20次/2s）
+    # result = spotAPI.get_orders_pending('XRP-USDT')
+    # 获取订单信息 （最近3个月的订单信息）（已撤销的未成交单只保留2个小时）（20次/2s）
+    # result = spotAPI.get_order_info('XRP-USDT', 3937857243189248)
+    # 获取成交明细 （最近3个月的数据）（20次/2s）
+    # result = spotAPI.get_fills('btc-usdt')
+    # 委托策略下单 （40次/2s）
+    # result = spotAPI.take_order_algo('XRP-USDT', '1', '1', '1', 'buy', trigger_price='0.2893', algo_price='0.2894')
+    result = spotAPI.take_order_algo('BTC-USDT', '1', '1', '1', 'buy', trigger_price='0.2893', algo_price='0.2894')
+    # 委托策略撤单 （每次最多可撤6（冰山/时间）/10（计划/跟踪）个）（20 次/2s）
+    # result = spotAPI.cancel_algos('XRP-USDT', ['377553'], '1')
+    # 获取委托单列表 （20次/2s）
+    # result = spotAPI.get_order_algos('XRP-USDT', '1', status='3')
+    # 公共-获取币对信息 （20次/2s）
+    # result = spotAPI.get_coin_info()
+    # 公共-获取深度数据 （20次/2s）
+    # result = spotAPI.get_depth('XRP-USDT')
+    # 公共-获取全部ticker信息 （50次/2s）
+    # result = spotAPI.get_ticker()
+    # 公共-获取某个ticker信息 （20次/2s）
+    # result = spotAPI.get_specific_ticker('ETH-USDT')
+    # 公共-获取成交数据 （最近60条数据）（20次/2s）
+    # result = spotAPI.get_deal('XRP-USDT')
+    # 公共-获取K线数据（最多可获取最近2000条）（20次/2s）
+    # result = spotAPI.get_kline('XRP-USDT', 60)
+    # print(len(result))
+
+    # print(time + json.dumps(result))
+    # logging.info("result:" + json.dumps(result))
+
+    print(time + json.dumps(result))
+    logging.info("result:" + json.dumps(result))
+
+    # print(time + json.dumps(result))
+    # logging.info("result:" + json.dumps(result))
+
+    # print(result)
+
+
+    # 数据库的建立
+    client = MongoClient("localhost", 27017)
+    db = client['BTC']['OKEXLONG']
+    mydict = {
+        "价格" : 9000 ,
+        "时间" : 2019 ,
+        "方向" : "long"
+    }
+
+    btcinfo = db.insert_one(mydict)
+    print(btcinfo)
+    exit()
+
+
+
+    '''
+    # -连接数据库
+    client = MongoClient("localhost", 27017)
+    db = client['BTC']['OKEXLONG']      #【datebaes]【collection]
+
+    # -写入数据库
+    mydict = {
+        "价格" : 6000 ,
+        "时间" : 2020 ,
+        "方向" : "short"
+    }
+    db.insert_one(mydict)
+
+    client = MongoClient("localhost", 27017)
+    db = client['BTC']['OKEXLONG']
+
+    # -读取数据库
+    read_db = db.find({})
+
+
+    # For 循环遍历
+    for i in read_db:
+        print(i)
+
+
+    # 循环查询订单，若撤销接着下单
+    while True:
+
+        check_order = swapAPI.get_order_info('BTC-USDT-SWAP', order_id)  # 获取订单详情
+        get_order_state = check_order['state']  # 查询订单状态
+        time.sleep(3)
+
+        if int(get_order_state) == 2:
+            if int(check_order['type']) == 1:  # 开多的订单完成
+                print("开多的订单已成交，设置平多的订单")
+                set_price = float(BTC_Ticker['last']) + 50.00
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "3", "price": set_price, "size": "1"}
+                ])
+                order_id = take_order['order_info'][0]['order_id']  # 刷新订单id
+
+            if int(check_order['type']) == 3:  # 平多的订单已完成，设置新的多单
+                print("平多的订单已成交，设置新的多单")
+                set_price = float(BTC_Ticker['last']) - 50.00
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "1", "price": set_price, "size": "1"}
+                ])
+                order_id = take_order['order_info'][0]['order_id']  # 刷新订单id
+
+
+        else:
+            print("订单未发生变化")
+
+    exit()
+# while x <= 3:
+#     bef = bef + float(a[x])
+#     x += 1
+#     print(bef)
+# while x<=6 :
+#     z = z + float(a[x])
+#     x += 1
+'''
+exit()
+
+
+
+
+
+    while Tmax + 50 > Last_price > Tmin - 50:
+        print("处于价格区间内,寻找趋势中...")
+        s = requests.session()
+        s.keep_alive = False
+        trend = trend_judge()
+
+        BTC_Ticker = swapAPI.get_specific_ticker('BTC-USDT-SWAP')
+        Last_price = float(BTC_Ticker['last'])
+        print("最新价格:", Last_price)
+
+        if trend[0] == 2 and Last_price < (Tmin + (0.3 * dif)):  # 上涨中且处于低点位置
+            print("当前处于震荡低点")
+            if Last_price < (Tmin + (0.1 * dif)):
+                print("处于低点第一阶段")
+
+                Exis = 0
+                read_db = db.find({})
+                for i in db.find({}):
+                    print('订单查询中')
+                    print(i['订单号'])
+                    get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+                    print('order state:', get_order_info['state'])
+
+                    # 如果订单中已有此区间成交的多单
+                    if get_order_info['state'] == "2" and get_order_info['type'] == "1" and get_order_info['price'] < (
+                            Tmin + (0.1 * dif)):
+                        print('此区间内已有多单')
+                        Exis = 1
+
+                if Exis == 0:
+                    take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                        {"type": "1", "price": Last_price, "size": "1"}
+                    ])
+                    order_id = take_order['order_info'][0]['order_id']  # 获取订单id
+                    get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', order_id)
+
+                    datalist = [{
+                        "订单号": get_order_info['order_id'],
+                        "价格": get_order_info['price'],
+                        "状态": get_order_info['state'],
+                        "方向": get_order_info['type']
+                    }]
+                    db.insert_many(datalist)
+
+                read_db = db.find({})
+                for i in db.find({}):
+                    print('订单查询中')
+                    print(i['订单号'])
+                    get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+                    print('order state:', get_order_info['state'])
+
+                    # 如果订单已成交且为开空
+                    if get_order_info['state'] == "2" and get_order_info['type'] == "2":
+                        print('开空订单已成交')
+                        # 删除数据库中数据
+                        myquery = {"订单号": i['订单号']}
+                        db.delete_one(myquery)
+                        # 下一个平空单
+                        take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                            {"type": "4",
+                             "price": float(BTC_Ticker['last']),
+                             "size": "1"}
+                        ])
+
+                while Last_price < (Tmin + (0.1 * dif)):
+                    print("仍处于低点第一阶段,价格<", Tmin + (0.1 * dif))
+                    time.sleep(5)
+                    BTC_Ticker = swapAPI.get_specific_ticker('BTC-USDT-SWAP')
+                    Last_price = float(BTC_Ticker['last'])
+
+            if (Tmin + (0.1 * dif)) < Last_price < (Tmin + (0.2 * dif)):
+                print("处于低点第二阶段")
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "1", "price": Last_price, "size": "1"}
+                ])
+                order_id = take_order['order_info'][0]['order_id']  # 获取订单id
+                get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', order_id)
+
+                datalist = [{
+                    "订单号": get_order_info['order_id'],
+                    "价格": get_order_info['price'],
+                    "状态": get_order_info['state'],
+                    "方向": get_order_info['type']
+                }]
+                db.insert_many(datalist)
+
+                read_db = db.find({})
+                for i in db.find({}):
+                    print('订单查询中')
+                    print(i['订单号'])
+                    get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+                    print('order state:', get_order_info['state'])
+
+                    # 如果订单已成交且为开空
+                    if get_order_info['state'] == "2" and get_order_info['type'] == "2":
+                        print('开空订单已成交')
+                        # 删除数据库中数据
+                        myquery = {"订单号": i['订单号']}
+                        db.delete_one(myquery)
+                        # 下一个平空单
+                        take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                            {"type": "4",
+                             "price": float(BTC_Ticker['last']),
+                             "size": "1"}
+                        ])
+
+                while (Tmin + (0.1 * dif)) < Last_price < (Tmin + (0.2 * dif)):
+                    print("仍处于低点第二阶段,价格<", Tmin + (0.2 * dif))
+                    time.sleep(5)
+                    BTC_Ticker = swapAPI.get_specific_ticker('BTC-USDT-SWAP')
+                    Last_price = float(BTC_Ticker['last'])
+
+            if (Tmin + (0.2 * dif)) < Last_price < (Tmin + (0.3 * dif)):
+                print("处于低点第三阶段")
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "1", "price": Last_price, "size": "1"}
+                ])
+                order_id = take_order['order_info'][0]['order_id']  # 获取订单id
+                get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', order_id)
+
+                datalist = [{
+                    "订单号": get_order_info['order_id'],
+                    "价格": get_order_info['price'],
+                    "状态": get_order_info['state'],
+                    "方向": get_order_info['type']
+                }]
+                db.insert_many(datalist)
+
+                read_db = db.find({})
+                for i in db.find({}):
+                    print('订单查询中')
+                    print(i['订单号'])
+                    get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+                    print('order state:', get_order_info['state'])
+
+                    # 如果订单已成交且为开空
+                    if get_order_info['state'] == "2" and get_order_info['type'] == "2":
+                        print('开空订单已成交')
+                        # 删除数据库中数据
+                        myquery = {"订单号": i['订单号']}
+                        db.delete_one(myquery)
+                        # 下一个平空单
+                        take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                            {"type": "4",
+                             "price": float(BTC_Ticker['last']),
+                             "size": "1"}
+                        ])
+                while (Tmin + (0.2 * dif)) < Last_price < (Tmin + (0.3 * dif)):
+                    print("仍处于低点第三阶段,价格<", Tmin + (0.3 * dif))
+                    time.sleep(5)
+                    BTC_Ticker = swapAPI.get_specific_ticker('BTC-USDT-SWAP')
+                    Last_price = float(BTC_Ticker['last'])
+
+        if trend[0] == 1 and Last_price > (Tmax - (0.3 * dif)):  # 下跌中且处于高点位置
+            print("当前处于震荡高点")
+            if Last_price > (Tmax - (0.1 * dif)):
+                print("处于高点第一阶段")
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "2", "price": Last_price, "size": "1"}
+                ])
+                order_id = take_order['order_info'][0]['order_id']  # 获取订单id
+                get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', order_id)
+
+                datalist = [{
+                    "订单号": get_order_info['order_id'],
+                    "价格": get_order_info['price'],
+                    "状态": get_order_info['state'],
+                    "方向": get_order_info['type']
+                }]
+                db.insert_many(datalist)
+
+                read_db = db.find({})
+                for i in db.find({}):
+                    print('订单查询中')
+                    print(i['订单号'])
+                    get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+                    print('order state:', get_order_info['state'])
+
+                    # 如果订单已成交且为开多
+                    if get_order_info['state'] == "2" and get_order_info['type'] == "1":
+                        print('开多订单已成交')
+                        # 删除数据库中数据
+                        myquery = {"订单号": i['订单号']}
+                        db.delete_one(myquery)
+                        # 下一个平多单
+                        take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                            {"type": "3",
+                             "price": float(BTC_Ticker['last']),
+                             "size": "1"}
+                        ])
+
+                while Last_price > (Tmax - (0.1 * dif)):
+                    print(Last_price, "仍处于高点第一阶段,价格>", Tmax - (0.1 * dif))
+                    time.sleep(5)
+                    BTC_Ticker = swapAPI.get_specific_ticker('BTC-USDT-SWAP')
+                    Last_price = float(BTC_Ticker['last'])
+
+            if (Tmax - (0.2 * dif)) < Last_price < (Tmax - (0.1 * dif)):
+                print("处于高点第二阶段")
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "2", "price": Last_price, "size": "1"}
+                ])
+                order_id = take_order['order_info'][0]['order_id']  # 获取订单id
+                get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', order_id)
+
+                datalist = [{
+                    "订单号": get_order_info['order_id'],
+                    "价格": get_order_info['price'],
+                    "状态": get_order_info['state'],
+                    "方向": get_order_info['type']
+                }]
+                db.insert_many(datalist)
+
+                read_db = db.find({})
+                for i in db.find({}):
+                    print('订单查询中')
+                    print(i['订单号'])
+                    get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+                    print('order state:', get_order_info['state'])
+
+                    # 如果订单已成交且为开多
+                    if get_order_info['state'] == "2" and get_order_info['type'] == "1":
+                        print('开多订单已成交')
+                        # 删除数据库中数据
+                        myquery = {"订单号": i['订单号']}
+                        db.delete_one(myquery)
+                        # 下一个平多单
+                        take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                            {"type": "3",
+                             "price": float(BTC_Ticker['last']),
+                             "size": "1"}
+                        ])
+
+                while (Tmax - (0.1 * dif)) > Last_price > (Tmax - (0.2 * dif)):
+                    print("最新价格:", Last_price)
+                    print("仍处于高点第二阶段,价格>", Tmax - (0.2 * dif))
+                    time.sleep(5)
+                    BTC_Ticker = swapAPI.get_specific_ticker('BTC-USDT-SWAP')
+                    Last_price = float(BTC_Ticker['last'])
+
+            if (Tmax - (0.3 * dif)) < Last_price < (Tmax - (0.2 * dif)):
+                print("处于高点第三阶段")
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "2", "price": Last_price, "size": "1"}
+                ])
+                order_id = take_order['order_info'][0]['order_id']  # 获取订单id
+                get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', order_id)
+
+                datalist = [{
+                    "订单号": get_order_info['order_id'],
+                    "价格": get_order_info['price'],
+                    "状态": get_order_info['state'],
+                    "方向": get_order_info['type']
+                }]
+                db.insert_many(datalist)
+
+                read_db = db.find({})
+                for i in db.find({}):
+                    print('订单查询中')
+                    print(i['订单号'])
+                    get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+                    print('order state:', get_order_info['state'])
+
+                    # 如果订单已成交且为开多
+                    if get_order_info['state'] == "2" and get_order_info['type'] == "1":
+                        print('开多订单已成交')
+                        # 删除数据库中数据
+                        myquery = {"订单号": i['订单号']}
+                        db.delete_one(myquery)
+                        # 下一个平多单
+                        take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                            {"type": "3",
+                             "price": float(BTC_Ticker['last']),
+                             "size": "1"}
+                        ])
+
+                while (Tmax - (0.2 * dif)) > Last_price > (Tmax - (0.3 * dif)):
+                    print(Last_price)
+                    print("仍处于高点第三阶段，价格>", Tmax - (0.3 * dif))
+                    time.sleep(5)
+                    BTC_Ticker = swapAPI.get_specific_ticker('BTC-USDT-SWAP')
+                    Last_price = float(BTC_Ticker['last'])
+
+    if Last_price > Tmax:
+        print("上涨超过区间，平空单，留多单")
+        read_db = db.find({})
+        for i in db.find({}):
+            print('订单查询中')
+            print(i['订单号'])
+            get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+            print('order state:', get_order_info['state'])
+
+            # 如果订单已成交且为开空
+            if get_order_info['state'] == "2" and get_order_info['type'] == "2":
+                print('开空订单已成交')
+                # 删除数据库中数据
+                myquery = {"订单号": i['订单号']}
+                db.delete_one(myquery)
+                # 下一个平空单
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "4",
+                     "price": float(BTC_Ticker['last']),
+                     "size": "1"}
+                ])
+
+    if Last_price > Tmax:
+        print("下跌超过区间，平多单，留空单")
+        read_db = db.find({})
+        for i in db.find({}):
+            print('订单查询中')
+            print(i['订单号'])
+            get_order_info = swapAPI.get_order_info('BTC-USDT-SWAP', i['订单号'])
+            print('order state:', get_order_info['state'])
+
+            # 如果订单已成交且为开多
+            if get_order_info['state'] == "2" and get_order_info['type'] == "1":
+                print('开多订单已成交')
+                # 删除数据库中数据
+                myquery = {"订单号": i['订单号']}
+                db.delete_one(myquery)
+                # 下一个平多单
+                take_order = swapAPI.take_orders('BTC-USDT-SWAP', [
+                    {"type": "3",
+                     "price": float(BTC_Ticker['last']),
+                     "size": "1"}
+                ])
